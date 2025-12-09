@@ -86,6 +86,7 @@ python train_gaussian.py --source_path "./projects/my_project" --iterations 3000
 * 이 프로젝트는 **UnityGaussianSplatting**을 기반으로 합니다. 원본 리포지토리를 Clone 하여 시작할 수 있습니다.
 ```bash
 git clone https://github.com/aras-p/UnityGaussianSplatting.git
+git clone https://github.com/graphdeco-inria/gaussian-splatting.git
 ```
 * gaussian-splatting 서브모듈 설치 참고
 ```bash
