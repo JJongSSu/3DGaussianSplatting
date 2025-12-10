@@ -68,7 +68,7 @@ echo.
 echo ============================================================
 echo Step 3/3: 3D Gaussian Splatting 학습
 echo ============================================================
-python train_gaussian.py --source_path "!OUTPUT_DIR!" --gs_path ".\gaussian-splatting" --iterations 30000
+python train_gaussian.py --source_path "!OUTPUT_DIR!" --gs_path ".\gaussian-splatting" --iterations 15000 -r 2
 
 if errorlevel 1 (
     echo [오류] 학습 실패
@@ -81,7 +81,7 @@ echo ============================================================
 echo 완료!
 echo ============================================================
 echo.
-echo PLY 파일 위치: !OUTPUT_DIR!\output\point_cloud\iteration_30000\point_cloud.ply
+echo PLY 파일 위치: !OUTPUT_DIR!\output\point_cloud\iteration_15000\point_cloud.ply
 echo.
 echo Unity에서 사용:
 echo   Tools - Gaussian Splats - Create GaussianSplatAsset

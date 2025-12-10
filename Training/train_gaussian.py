@@ -69,7 +69,9 @@ def run_training(
     gs_path: str,
     output_path: str = None,
     iterations: int = 30000,
-    save_iterations: list = None
+    save_iterations: list = None,
+    resolution: int = -1,
+    sh_degree: int = 3
 ):
     """
     3D Gaussian Splatting 학습을 실행합니다.
@@ -80,6 +82,8 @@ def run_training(
         output_path: 출력 경로 (기본값: source_path/output)
         iterations: 학습 반복 횟수
         save_iterations: PLY 저장할 반복 횟수들
+        resolution: 이미지 해상도 다운스케일 (-1: 원본, 2: 1/2, 4: 1/4)
+        sh_degree: Spherical Harmonics 차수 (0~3)
     """
     
     source_path = Path(source_path).resolve()
@@ -117,7 +121,9 @@ def run_training(
         "-s", str(source_path),
         "-m", str(output_path),
         "--iterations", str(iterations),
-        "--save_iterations", *map(str, save_iterations)
+        "--save_iterations", *map(str, save_iterations),
+        "-r", str(resolution),
+        "--sh_degree", str(sh_degree)
     ]
     
     print(f"\n명령어: {' '.join(cmd)}")
@@ -180,6 +186,18 @@ def main():
         help="학습 반복 횟수 (기본값: 30000)"
     )
     parser.add_argument(
+        "--resolution", "-r",
+        type=int,
+        default=-1,
+        help="이미지 해상도 다운스케일 팩터 (1, 2, 4, 8 등)"
+    )
+    parser.add_argument(
+        "--sh_degree",
+        type=int,
+        default=3,
+        help="Spherical Harmonics 차수 (0-3)"
+    )
+    parser.add_argument(
         "--setup",
         action="store_true",
         help="gaussian-splatting 환경 설정 실행"
@@ -216,7 +234,9 @@ def main():
         source_path=args.source_path,
         gs_path=str(gs_path),
         output_path=args.output_path,
-        iterations=args.iterations
+        iterations=args.iterations,
+        resolution=args.resolution,
+        sh_degree=args.sh_degree
     )
 
 
