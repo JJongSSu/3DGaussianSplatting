@@ -1,4 +1,4 @@
-from ultralytics import YOLOWorld, SAM
+from ultralytics import YOLOWorld, YOLO, SAM
 import cv2
 import os
 import numpy as np
@@ -6,20 +6,24 @@ import argparse
 from pathlib import Path
 import torch
 
-def process_images(input_dir, output_dir, prompt="concrete bridge"):
-    print(f"Initializing models... (Prompt: '{prompt}')")
+def process_images(input_dir, output_dir, model_path=None, prompt="concrete bridge"):
 
     # 모델 경로 설정 (Scripts 폴더의 상위 폴더인 Training 아래 Models 폴더 참조)
     script_dir = Path(__file__).resolve().parent
     model_dir = script_dir.parent / "Models"
-    
-    yolo_path = model_dir / 'yolov8x-worldv2.pt'
     sam_path = model_dir / 'sam_b.pt'
 
-    # 1. YOLO-World 로드 (텍스트로 객체 위치 탐지)
-    # 처음 실행 시 모델 파일을 자동으로 다운로드합니다.
-    det_model = YOLOWorld(str(yolo_path))
-    det_model.set_classes([prompt])
+    # 1. Detection 모델 로드 (Custom YOLO 또는 YOLO-World)
+    if model_path and os.path.exists(model_path):
+        print(f"Loading custom model from: {model_path}")
+        # .onnx 또는 .pt 파일 로드. task='detect'는 자동으로 추론됨
+        det_model = YOLO(model_path)
+        # 커스텀 모델은 set_classes가 필요 없음 (학습된 클래스 그대로 사용)
+    else:
+        print(f"Initializing YOLO-World... (Prompt: '{prompt}')")
+        yolo_path = model_dir / 'yolov8x-worldv2.pt'
+        det_model = YOLOWorld(str(yolo_path))
+        det_model.set_classes([prompt])
 
     # 2. SAM 로드 (박스 기반 정밀 마스킹)
     seg_model = SAM(str(sam_path))
@@ -84,7 +88,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', type=str, required=True, help='Path to original input images folder')
     parser.add_argument('--output', type=str, required=True, help='Path to save masked images')
-    parser.add_argument('--prompt', type=str, default='concrete bridge', help='Text prompt for detection (e.g. "bridge", "pillar")')
+    parser.add_argument('--model', type=str, default=None, help='Path to custom YOLO model (.onnx or .pt). If not provided, uses YOLO-World.')
+    parser.add_argument('--prompt', type=str, default='concrete bridge', help='Text prompt for YOLO-World (ignored if custom model is used)')
 
     args = parser.parse_args()
-    process_images(args.input, args.output, args.prompt)
+    process_images(args.input, args.output, args.model, args.prompt)
